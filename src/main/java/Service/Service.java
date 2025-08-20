@@ -11,6 +11,7 @@ import Model.Account;
 import Model.Message;
 import DAO.DAO;
 
+import java.util.ArrayList;
 
 public class Service {
     ObjectMapper om;
@@ -20,7 +21,7 @@ public class Service {
         om = new ObjectMapper();
         dao = new DAO();
     }
-
+    // Account business logic
     public Account processRegistration(String jsonString)
     {
         try
@@ -41,6 +42,58 @@ public class Service {
         {
             Account loginUser = om.readValue(jsonString, Account.class);
             return dao.executeLoginQuery(loginUser);
+        }
+        catch (JsonProcessingException e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+
+    //Message business logic
+    public ArrayList<Message> getAllMessages()
+    {
+        return dao.getAllMessagesQuery();
+    }
+
+    public Message getMessageById(int messageId)
+    {
+        return dao.getMessageByIdQuery(messageId);
+    }
+
+    public ArrayList<Message> getAllMessagesByUser(int accountId)
+    {
+        return dao.getAllMessagesByAccountIdQuery(accountId);
+    }
+    
+    public Message processNewMessage(String jsonString)
+    {
+        try
+        {
+            Message newMessage = om.readValue(jsonString, Message.class);
+            return dao.executeNewMessageQuery(newMessage);
+        }
+        catch (JsonProcessingException e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+
+    public Message processDeleteMessage(int messageId)
+    {
+        return dao.executeDeleteMessageQuery(messageId);
+    }
+
+    public Message processUpdateMessage(String jsonString, int messageId)
+    {
+        try
+        {
+            Message updatedMessage = om.readValue(jsonString, Message.class);
+            updatedMessage.setMessage_id(messageId);
+            return dao.executeUpdateMessageQuery(updatedMessage);
         }
         catch (JsonProcessingException e)
         {
