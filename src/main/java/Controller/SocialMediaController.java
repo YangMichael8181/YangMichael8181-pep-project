@@ -1,13 +1,16 @@
+// NOTE: this file will handle endpoints
+// Will gather the body of the request, then send the body of the request to Service.java
+
 package Controller;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
-/**
- * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
- * found in readme.md as well as the test cases. You should
- * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
- */
+// import Service layer class
+import Service.Service;
+import Model.Account;
+import Model.Message;
+
 public class SocialMediaController {
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
@@ -16,7 +19,44 @@ public class SocialMediaController {
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
+
+        Service service = new Service();
+
+        // user registration endpoint
+        // url: POST localhost:8080/register
+        app.post("register", ctx -> {
+            String jsonString = ctx.body();
+            Account newUser = service.processRegistration(jsonString);
+            if (newUser == null)
+            {
+                ctx.status(400);
+            }
+            else
+            {
+                ctx.status(200);
+                ctx.json(newUser);
+            }
+        });
+
+        // user login
+        app.post("login", ctx -> {
+            String jsonString = ctx.body();
+            Account loginUser = service.processLogin(jsonString);
+            if (loginUser == null)
+            {
+                ctx.status(401);
+            }
+            else
+            {
+                ctx.status(200);
+                ctx.json(loginUser);
+            }
+        });
+
+
         app.get("example-endpoint", this::exampleHandler);
+
+
 
         return app;
     }
@@ -28,6 +68,8 @@ public class SocialMediaController {
     private void exampleHandler(Context context) {
         context.json("sample text");
     }
+
+    
 
 
 }
